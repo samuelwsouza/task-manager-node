@@ -7,10 +7,8 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Cria uma instância do controlador
 const taskController = new TaskController();
 
-// Configura as rotas
 const router = taskRoutes(taskController);
 
 app.use(express.json());

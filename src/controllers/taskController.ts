@@ -1,7 +1,11 @@
 import { Request, Response } from "express";
+import { ITaskService } from "../interfaces/service.interface";
+class TaskController implements ITaskService {
+  private taskService: ITaskService;
 
-export class TaskController {
-  constructor() {
+  constructor(taskService: ITaskService) {
+    this.taskService = taskService;
+
     this.createTask = this.createTask.bind(this);
     this.findAllTasks = this.findAllTasks.bind(this);
     this.findTaskById = this.findTaskById.bind(this);
@@ -11,38 +15,121 @@ export class TaskController {
     this.updateToComplete = this.updateToComplete.bind(this);
   }
 
-  async createTask(req: Request, res: Response): Promise<any> {
-    // Lógica para criar uma tarefa
-    res.status(201).json({ message: "Task created" });
+  async createTask(
+    req: Request,
+    res: Response
+  ): Promise<void | Response<any, Record<string, any>>> {
+    try {
+      const { title, description, status } = req.body;
+
+      if (!title || !description) {
+        return res
+          .status(400)
+          .json({ message: "A tarefa precisa ter um título/descrição!" });
+      }
+
+      const newTask = await this.taskService.createTask({
+        title,
+        description,
+        status,
+      });
+
+      res.status(201).json(newTask);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: "Erro interno" });
+    }
   }
 
   async findAllTasks(req: Request, res: Response): Promise<any> {
-    // Lógica para listar tarefas
-    res.status(200).json({ message: "All tasks" });
+    try {
+      const { status, userId } = req.query;
+      const { page = 1, limit = 10 } = req.query;
+
+      const tasks = await this.taskService.findAll(
+        { status: status as string, userId: userId as string },
+        { page: Number(page), limit: Number(limit) }
+      );
+
+      return res.status(200).json(tasks);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: "Erro interno" });
+    }
   }
 
   async findTaskById(req: Request, res: Response): Promise<any> {
-    // Lógica para buscar uma tarefa específica
-    res.status(200).json({ message: "Task by id" });
+    try {
+      const { id } = req.params;
+
+      const task = await this.taskService.findById(id);
+
+      return res.status(200).json(task);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: "Erro interno" });
+    }
   }
 
   async updateTask(req: Request, res: Response): Promise<any> {
-    // Lógica para atualizar tarefa
-    res.status(200).json({ message: "Task updated" });
+    try {
+      const { id } = req.params;
+      const { title, description, status } = req.body;
+
+      const updatedTask = await this.taskService.update(id, {
+        title,
+        description,
+        status,
+      });
+
+      return res.status(200).json(updatedTask);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: "Erro interno" });
+    }
   }
 
   async deleteTask(req: Request, res: Response): Promise<any> {
-    // Lógica para deletar tarefa
-    res.status(200).json({ message: "Task deleted" });
+    try {
+      const { id } = req.params;
+
+      await this.taskService.delete(id);
+
+      return res.status(200).json({ message: "Tarefa excluída com sucesso!" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: "Erro interno" });
+    }
   }
 
-  async findByStatus(req: Request, res: Response): Promise<any> {
-    // Lógica para achar task por status como completed
-    res.status(200).json({ message: "Tasks by status" });
+  async findByStatus(req: Request, res: Response): Promise<Response | void> {
+    try {
+      const { status } = req.params;
+
+      const tasks = await this.taskService.findByStatus(status);
+
+      return res.status(200).json(tasks);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: "Erro interno" });
+    }
   }
 
-  async updateToComplete(req: Request, res: Response): Promise<any> {
-    // Lógica para colocar tarefa como concluída
-    res.status(200).json({ message: "Task completed" });
+  async updateToComplete(
+    req: Request,
+    res: Response
+  ): Promise<Response | void> {
+    try {
+      const { id } = req.params;
+
+      const updatedTask = await this.taskService.updateToComplete(id);
+
+      return res.status(200).json(updatedTask);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: "Erro interno" });
+    }
   }
 }
+
+export default TaskController;
