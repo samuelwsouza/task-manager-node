@@ -1,6 +1,6 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { ITaskService } from "../interfaces/service.interface";
-class TaskController implements ITaskService {
+class TaskController {
   private taskService: ITaskService;
 
   constructor(taskService: ITaskService) {
@@ -17,7 +17,8 @@ class TaskController implements ITaskService {
 
   async createTask(
     req: Request,
-    res: Response
+    res: Response,
+    next: NextFunction
   ): Promise<void | Response<any, Record<string, any>>> {
     try {
       const { title, description, status } = req.body;
@@ -28,7 +29,7 @@ class TaskController implements ITaskService {
           .json({ message: "A tarefa precisa ter um título/descrição!" });
       }
 
-      const newTask = await this.taskService.createTask({
+      const newTask = await this.taskService.create({
         title,
         description,
         status,
@@ -36,12 +37,15 @@ class TaskController implements ITaskService {
 
       res.status(201).json(newTask);
     } catch (error) {
-      console.log(error);
-      res.status(500).json({ error: "Erro interno" });
+      next(error);
     }
   }
 
-  async findAllTasks(req: Request, res: Response): Promise<any> {
+  async findAllTasks(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<any> {
     try {
       const { status, userId } = req.query;
       const { page = 1, limit = 10 } = req.query;
@@ -53,12 +57,15 @@ class TaskController implements ITaskService {
 
       return res.status(200).json(tasks);
     } catch (error) {
-      console.log(error);
-      return res.status(500).json({ error: "Erro interno" });
+      next(error);
     }
   }
 
-  async findTaskById(req: Request, res: Response): Promise<any> {
+  async findTaskById(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<any> {
     try {
       const { id } = req.params;
 
@@ -66,12 +73,15 @@ class TaskController implements ITaskService {
 
       return res.status(200).json(task);
     } catch (error) {
-      console.log(error);
-      return res.status(500).json({ error: "Erro interno" });
+      next(error);
     }
   }
 
-  async updateTask(req: Request, res: Response): Promise<any> {
+  async updateTask(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<any> {
     try {
       const { id } = req.params;
       const { title, description, status } = req.body;
@@ -84,12 +94,15 @@ class TaskController implements ITaskService {
 
       return res.status(200).json(updatedTask);
     } catch (error) {
-      console.log(error);
-      return res.status(500).json({ error: "Erro interno" });
+      next(error);
     }
   }
 
-  async deleteTask(req: Request, res: Response): Promise<any> {
+  async deleteTask(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<any> {
     try {
       const { id } = req.params;
 
@@ -97,12 +110,15 @@ class TaskController implements ITaskService {
 
       return res.status(200).json({ message: "Tarefa excluída com sucesso!" });
     } catch (error) {
-      console.log(error);
-      return res.status(500).json({ error: "Erro interno" });
+      next(error);
     }
   }
 
-  async findByStatus(req: Request, res: Response): Promise<Response | void> {
+  async findByStatus(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
     try {
       const { status } = req.params;
 
@@ -110,14 +126,14 @@ class TaskController implements ITaskService {
 
       return res.status(200).json(tasks);
     } catch (error) {
-      console.log(error);
-      return res.status(500).json({ error: "Erro interno" });
+      next(error);
     }
   }
 
   async updateToComplete(
     req: Request,
-    res: Response
+    res: Response,
+    next: NextFunction
   ): Promise<Response | void> {
     try {
       const { id } = req.params;
@@ -126,8 +142,7 @@ class TaskController implements ITaskService {
 
       return res.status(200).json(updatedTask);
     } catch (error) {
-      console.log(error);
-      return res.status(500).json({ error: "Erro interno" });
+      next(error);
     }
   }
 }
