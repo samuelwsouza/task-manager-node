@@ -1,7 +1,8 @@
 import { NextFunction } from "express";
+import { ITaskService } from "../interfaces/service.interface";
 
 export interface ITaskController {
-  // taskService: ITaskService;
+  taskService: ITaskService;
 
   createTask(
     req: Request,
