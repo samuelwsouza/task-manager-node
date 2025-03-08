@@ -1,5 +1,5 @@
-import { NextFunction } from "express";
-import { ITaskService } from "../interfaces/service.interface";
+import { Request, Response, NextFunction } from "express";
+import { ITaskService } from "./service.interface";
 
 export interface ITaskController {
   taskService: ITaskService;

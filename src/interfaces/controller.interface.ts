@@ -1,4 +1,4 @@
-import { ITaskController } from "./tasks.interface";
+import { ITaskController } from "./taskController.interface";
 
 export type TController = {
   taskController: ITaskController;
