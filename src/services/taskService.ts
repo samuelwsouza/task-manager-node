@@ -1,14 +1,15 @@
-import { ITask } from "../interfaces/taskInterface";
+import { ITaskService } from "../interfaces/service.interface";
+import { ITask } from "../interfaces/task.interface";
 import { TaskRepository } from "../repositories/taskRepository";
 
-export class TaskService {
+export class TaskService implements ITaskService {
   private taskRepository: TaskRepository;
 
   constructor() {
     this.taskRepository = new TaskRepository();
   }
 
-  async createTask(taskData: {
+  async create(taskData: {
     title: string;
     description: string;
     status: string;
@@ -32,27 +33,70 @@ export class TaskService {
     }
   }
 
-  async findAllTasks(req: Request, res: Response): Promise<any> {
-    // Lógica para listar tarefas
+  async findAll(
+    filters?: { status?: string; userId?: string },
+    pagination?: { page: number; limit: number }
+  ): Promise<ITask[]> {
+    try {
+      const allMyTasks = await this.taskRepository.findAll(filters, pagination);
+      return allMyTasks;
+    } catch (error) {
+      throw new Error("Falha ao encontrar todas as suas tarefas...");
+    }
   }
 
-  async findTaskById(req: Request, res: Response): Promise<any> {
-    // Lógica para buscar uma tarefa específica
+  async findById(id: string): Promise<ITask | null> {
+    try {
+      const task = await this.taskRepository.findById(id);
+      return task;
+    } catch (error) {
+      throw new Error("Falha ao encontrar sua específica tarefa...");
+    }
   }
 
-  async updateTask(req: Request, res: Response): Promise<any> {
-    // Lógica para atualizar tarefa
+  async update(
+    id: string,
+    taskData: { title?: string; description?: string; status?: string }
+  ): Promise<ITask | null> {
+    try {
+      const updatedTask = await this.taskRepository.update(id, taskData);
+      return updatedTask;
+    } catch (error) {
+      throw new Error("Falha ao atualizar sua tarefa...");
+    }
   }
 
-  async deleteTask(req: Request, res: Response): Promise<any> {
-    // Lógica para deletar tarefa
+  async delete(id: string): Promise<boolean> {
+    try {
+      const isDeleted = await this.taskRepository.delete(id);
+      return isDeleted;
+    } catch (error) {
+      throw new Error("Falha ao deletar sua tarefa...");
+    }
   }
 
-  async findByStatus(req: Request, res: Response): Promise<any> {
-    // Lógica para achar task por status como completed
+  async findByStatus(status: string): Promise<ITask[]> {
+    try {
+      const tasks = await this.taskRepository.findByStatus(status);
+      return tasks;
+    } catch (error) {
+      throw new Error("Failed to find tasks by status}");
+    }
   }
 
-  async updateToComplete(req: Request, res: Response): Promise<any> {
-    // Lógica para colocar tarefa como concluída
+  async updateToComplete(id: string): Promise<ITask> {
+    try {
+      const updatedTask = await this.taskRepository.update(id, {
+        status: "completed",
+      });
+
+      if (!updatedTask) {
+        throw new Error("Tarefa não encontrada");
+      }
+
+      return updatedTask;
+    } catch (error) {
+      throw new Error("Failed to update task to complete");
+    }
   }
 }
