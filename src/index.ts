@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import taskRoutes from "./routes/taskRoutes";
-import { TaskController } from "./controllers/taskController";
+import TaskController from "./controllers/taskController";
 
 dotenv.config();
 const app = express();
