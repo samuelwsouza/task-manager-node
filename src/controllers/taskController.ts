@@ -1,32 +1,26 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
+import { ITaskController } from "../interfaces/taskController.interface";
 import { ITaskService } from "../interfaces/service.interface";
-class TaskController {
-  private taskService: ITaskService;
+
+export class TaskController implements ITaskController {
+  taskService: ITaskService;
 
   constructor(taskService: ITaskService) {
     this.taskService = taskService;
-
-    this.createTask = this.createTask.bind(this);
-    this.findAllTasks = this.findAllTasks.bind(this);
-    this.findTaskById = this.findTaskById.bind(this);
-    this.updateTask = this.updateTask.bind(this);
-    this.deleteTask = this.deleteTask.bind(this);
-    this.findByStatus = this.findByStatus.bind(this);
-    this.updateToComplete = this.updateToComplete.bind(this);
   }
 
   async createTask(
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<void | Response<any, Record<string, any>>> {
+  ): Promise<void | Response> {
     try {
       const { title, description, status } = req.body;
 
-      if (!title || !description) {
+      if (!title && !description) {
         return res
           .status(400)
-          .json({ message: "A tarefa precisa ter um título/descrição!" });
+          .json({ message: "Title and description are required" });
       }
 
       const newTask = await this.taskService.create({
@@ -34,8 +28,7 @@ class TaskController {
         description,
         status,
       });
-
-      res.status(201).json(newTask);
+      return res.status(201).json(newTask);
     } catch (error) {
       next(error);
     }
@@ -45,7 +38,7 @@ class TaskController {
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<any> {
+  ): Promise<void | Response> {
     try {
       const { status, userId } = req.query;
       const { page = 1, limit = 10 } = req.query;
@@ -65,12 +58,10 @@ class TaskController {
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<any> {
+  ): Promise<void | Response> {
     try {
       const { id } = req.params;
-
       const task = await this.taskService.findById(id);
-
       return res.status(200).json(task);
     } catch (error) {
       next(error);
@@ -81,7 +72,7 @@ class TaskController {
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<any> {
+  ): Promise<void | Response> {
     try {
       const { id } = req.params;
       const { title, description, status } = req.body;
@@ -91,7 +82,6 @@ class TaskController {
         description,
         status,
       });
-
       return res.status(200).json(updatedTask);
     } catch (error) {
       next(error);
@@ -102,13 +92,11 @@ class TaskController {
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<any> {
+  ): Promise<void | Response> {
     try {
       const { id } = req.params;
-
       await this.taskService.delete(id);
-
-      return res.status(200).json({ message: "Tarefa excluída com sucesso!" });
+      return res.status(200).json({ message: "Task deleted successfully" });
     } catch (error) {
       next(error);
     }
@@ -118,12 +106,10 @@ class TaskController {
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<Response | void> {
+  ): Promise<void | Response> {
     try {
       const { status } = req.params;
-
       const tasks = await this.taskService.findByStatus(status);
-
       return res.status(200).json(tasks);
     } catch (error) {
       next(error);
@@ -134,17 +120,13 @@ class TaskController {
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<Response | void> {
+  ): Promise<void | Response> {
     try {
       const { id } = req.params;
-
       const updatedTask = await this.taskService.updateToComplete(id);
-
       return res.status(200).json(updatedTask);
     } catch (error) {
       next(error);
     }
   }
 }
-
-export default TaskController;
