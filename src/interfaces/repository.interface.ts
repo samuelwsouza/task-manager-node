@@ -6,6 +6,7 @@ export interface ITaskRepository {
     title: string;
     description: string;
     status: string;
+    userId: string;
   }): Promise<ITask>;
 
   // Busca uma tarefa pelo ID
