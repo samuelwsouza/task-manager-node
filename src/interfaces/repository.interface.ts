@@ -5,7 +5,7 @@ export interface ITaskRepository {
   create(taskData: {
     title: string;
     description: string;
-    status: string;
+    status?: "pending" | "completed" | "canceled";
     userId: string;
   }): Promise<ITask>;
 
@@ -14,19 +14,26 @@ export interface ITaskRepository {
 
   // Busca todas as tarefas (com filtros e paginação)
   findAll(
-    filters?: { status?: string; userId?: string },
+    filters?: {
+      status?: "pending" | "completed" | "canceled";
+      userId?: string;
+    },
     pagination?: { page: number; limit: number }
   ): Promise<ITask[]>;
 
   // Atualiza uma tarefa existente
   update(
     id: string,
-    taskData: { title?: string; description?: string; status?: string }
+    taskData: {
+      title?: string;
+      description?: string;
+      status?: "pending" | "completed" | "canceled";
+    }
   ): Promise<ITask | null>;
 
   // Deleta uma tarefa
   delete(id: string): Promise<boolean>;
 
   // Busca tarefas por status
-  findByStatus(status: string): Promise<ITask[]>;
+  findByStatus(status: "pending" | "completed" | "canceled"): Promise<ITask[]>;
 }
