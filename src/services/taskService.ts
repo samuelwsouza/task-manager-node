@@ -12,36 +12,40 @@ export class TaskService implements ITaskService {
   async create(taskData: {
     title: string;
     description: string;
-    status: string;
+    status?: "pending" | "completed" | "canceled";
+    userId: string;
   }): Promise<ITask> {
     try {
-      if (!taskData.title || !taskData.description) {
-        throw new Error("Título/Descrição é obrigatório!");
+      if (!taskData.title || !taskData.description || !taskData.userId) {
+        throw new Error("Title, description, and userId are required");
       }
 
       const newTaskData = {
         title: taskData.title,
         description: taskData.description,
         status: taskData.status || "pending",
+        userId: taskData.userId,
       };
 
       const newTask = await this.taskRepository.create(newTaskData);
-
       return newTask;
     } catch (error) {
-      throw new Error("Falha ao criar a tarefa");
+      throw new Error("Falha ao criar a tarefa...");
     }
   }
 
   async findAll(
-    filters?: { status?: string; userId?: string },
+    filters?: {
+      status?: "pending" | "completed" | "canceled";
+      userId?: string;
+    },
     pagination?: { page: number; limit: number }
   ): Promise<ITask[]> {
     try {
-      const allMyTasks = await this.taskRepository.findAll(filters, pagination);
-      return allMyTasks;
+      const tasks = await this.taskRepository.findAll(filters, pagination);
+      return tasks;
     } catch (error) {
-      throw new Error("Falha ao encontrar todas as suas tarefas...");
+      throw new Error("Falha ao listar todas as tarefas...");
     }
   }
 
@@ -56,7 +60,11 @@ export class TaskService implements ITaskService {
 
   async update(
     id: string,
-    taskData: { title?: string; description?: string; status?: string }
+    taskData: {
+      title?: string;
+      description?: string;
+      status?: "pending" | "completed" | "canceled";
+    }
   ): Promise<ITask | null> {
     try {
       const updatedTask = await this.taskRepository.update(id, taskData);
@@ -75,12 +83,14 @@ export class TaskService implements ITaskService {
     }
   }
 
-  async findByStatus(status: string): Promise<ITask[]> {
+  async findByStatus(
+    status: "pending" | "completed" | "canceled"
+  ): Promise<ITask[]> {
     try {
       const tasks = await this.taskRepository.findByStatus(status);
       return tasks;
     } catch (error) {
-      throw new Error("Failed to find tasks by status}");
+      throw new Error("Falha ao encontrar suas tarefas...");
     }
   }
 
@@ -91,12 +101,12 @@ export class TaskService implements ITaskService {
       });
 
       if (!updatedTask) {
-        throw new Error("Tarefa não encontrada");
+        throw new Error("Task not found");
       }
 
       return updatedTask;
     } catch (error) {
-      throw new Error("Failed to update task to complete");
+      throw new Error("Falha ao atualizar sua tarefa para concluída...");
     }
   }
 }
