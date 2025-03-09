@@ -5,14 +5,15 @@ export class TaskRepository implements ITaskRepository {
   async create(taskData: {
     title: string;
     description: string;
-    status: string;
+    status?: "pending" | "completed" | "canceled";
     userId: string;
   }): Promise<ITask> {
+    // Simulação de uma operação de banco de dados
     const newTask: ITask = {
       id: "1",
       title: taskData.title,
       description: taskData.description,
-      status: taskData.status as "pending" | "completed" | "canceled",
+      status: taskData.status || "pending",
       userId: taskData.userId,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -28,7 +29,7 @@ export class TaskRepository implements ITaskRepository {
     },
     pagination?: { page: number; limit: number }
   ): Promise<ITask[]> {
-    // Simulação de busca
+    // Simulação de busca no banco de dados
     const tasks: ITask[] = [
       {
         id: "1",
@@ -76,7 +77,7 @@ export class TaskRepository implements ITaskRepository {
       status?: "pending" | "completed" | "canceled";
     }
   ): Promise<ITask | null> {
-    // Simulação de atualização
+    // Simulação de atualização no banco de dados
     const updatedTask: ITask = {
       id,
       title: taskData.title || "Updated Task",
@@ -98,7 +99,7 @@ export class TaskRepository implements ITaskRepository {
   async findByStatus(
     status: "pending" | "completed" | "canceled"
   ): Promise<ITask[]> {
-    // Simulação de busca
+    // Simulação de busca no banco de dados
     const tasks: ITask[] = [
       {
         id: "1",
