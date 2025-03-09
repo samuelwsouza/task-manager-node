@@ -7,6 +7,14 @@ export class TaskController implements ITaskController {
 
   constructor(taskService: ITaskService) {
     this.taskService = taskService;
+
+    this.createTask = this.createTask.bind(this);
+    this.findAllTasks = this.findAllTasks.bind(this);
+    this.findTaskById = this.findTaskById.bind(this);
+    this.updateTask = this.updateTask.bind(this);
+    this.deleteTask = this.deleteTask.bind(this);
+    this.findByStatus = this.findByStatus.bind(this);
+    this.updateToComplete = this.updateToComplete.bind(this);
   }
 
   async createTask(
