@@ -19,11 +19,7 @@ export interface ITaskRepository {
       userId?: string;
     },
     pagination?: { page: number; limit: number }
-<<<<<<< HEAD
   ): Promise<{ tasks: ITask[]; total: number }>;
-=======
-  ): Promise<ITask[]>;
->>>>>>> 975addfb94aee9d418e1e470b2dc1d64e7972293
 
   // Atualiza uma tarefa existente
   update(
