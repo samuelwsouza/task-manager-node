@@ -6,7 +6,10 @@ export interface ITaskService {
     title: string;
     description: string;
     status?: string;
+<<<<<<< HEAD
     userId: string;
+=======
+>>>>>>> 975addfb94aee9d418e1e470b2dc1d64e7972293
   }): Promise<any>;
 
   // Lista todas as tarefas (com filtros e paginação)
