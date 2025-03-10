@@ -1,5 +1,5 @@
-import { ITaskService } from "../interfaces/service.interface";
-import { ITask } from "../interfaces/task.interface";
+import { ITaskService } from "../interfaces/tasks/service.interface";
+import { ITask } from "../interfaces/tasks/task.interface";
 import { TaskRepository } from "../repositories/taskRepository";
 
 export class TaskService implements ITaskService {

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { ITaskController } from "../interfaces/taskController.interface";
-import { ITaskService } from "../interfaces/service.interface";
+import { ITaskController } from "../interfaces/tasks/taskController.interface";
+import { ITaskService } from "../interfaces/tasks/service.interface";
 
 export class TaskController implements ITaskController {
   taskService: ITaskService;

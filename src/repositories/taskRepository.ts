@@ -1,5 +1,5 @@
-import { ITaskRepository } from "../interfaces/repository.interface";
-import { ITask } from "../interfaces/task.interface";
+import { ITaskRepository } from "../interfaces/tasks/repository.interface";
+import { ITask } from "../interfaces/tasks/task.interface";
 import { TaskModel } from "../models/taskModel";
 import mongoose, { Types } from "mongoose";
 
