@@ -30,6 +30,7 @@ export class TaskService implements ITaskService {
       const newTask = await this.taskRepository.create(newTaskData);
       return newTask;
     } catch (error) {
+      console.log("Erro ao criar a tarefa:", error);
       throw new Error("Falha ao criar a tarefa...");
     }
   }
@@ -40,10 +41,13 @@ export class TaskService implements ITaskService {
       userId?: string;
     },
     pagination?: { page: number; limit: number }
-  ): Promise<ITask[]> {
+  ): Promise<{ tasks: ITask[]; total: number }> {
     try {
-      const tasks = await this.taskRepository.findAll(filters, pagination);
-      return tasks;
+      const { tasks, total } = await this.taskRepository.findAll(
+        filters,
+        pagination
+      );
+      return { tasks, total };
     } catch (error) {
       throw new Error("Falha ao listar todas as tarefas...");
     }

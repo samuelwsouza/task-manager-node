@@ -23,18 +23,13 @@ export class TaskController implements ITaskController {
     next: NextFunction
   ): Promise<void | Response> {
     try {
-      const { title, description, status } = req.body;
-
-      if (!title && !description) {
-        return res
-          .status(400)
-          .json({ message: "Title and description are required" });
-      }
+      const { title, description, status, userId } = req.body;
 
       const newTask = await this.taskService.create({
         title,
         description,
         status,
+        userId,
       });
       return res.status(201).json(newTask);
     } catch (error) {
@@ -51,12 +46,12 @@ export class TaskController implements ITaskController {
       const { status, userId } = req.query;
       const { page = 1, limit = 10 } = req.query;
 
-      const tasks = await this.taskService.findAll(
+      const { tasks, total } = await this.taskService.findAll(
         { status: status as string, userId: userId as string },
         { page: Number(page), limit: Number(limit) }
       );
 
-      return res.status(200).json(tasks);
+      return res.status(200).json({ tasks, total });
     } catch (error) {
       next(error);
     }
