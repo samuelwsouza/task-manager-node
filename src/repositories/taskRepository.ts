@@ -1,5 +1,7 @@
 import { ITaskRepository } from "../interfaces/repository.interface";
 import { ITask } from "../interfaces/task.interface";
+import { TaskModel } from "../models/taskModel";
+import mongoose, { Types } from "mongoose";
 
 export class TaskRepository implements ITaskRepository {
   async create(taskData: {
@@ -8,18 +10,18 @@ export class TaskRepository implements ITaskRepository {
     status?: "pending" | "completed" | "canceled";
     userId: string;
   }): Promise<ITask> {
-    // Simulação de uma operação de banco de dados
-    const newTask: ITask = {
-      id: "1",
-      title: taskData.title,
-      description: taskData.description,
-      status: taskData.status || "pending",
-      userId: taskData.userId,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    const newTask = new TaskModel(taskData);
+    const savedTask = await newTask.save();
 
-    return newTask;
+    return {
+      id: savedTask._id.toString(), // Convertendo _id para string
+      title: savedTask.title,
+      description: savedTask.description,
+      status: savedTask.status,
+      userId: savedTask.userId,
+      createdAt: savedTask.createdAt,
+      updatedAt: savedTask.updatedAt,
+    };
   }
 
   async findAll(
@@ -28,45 +30,52 @@ export class TaskRepository implements ITaskRepository {
       userId?: string;
     },
     pagination?: { page: number; limit: number }
-  ): Promise<ITask[]> {
-    // Simulação de busca no banco de dados
-    const tasks: ITask[] = [
-      {
-        id: "1",
-        title: "Task 1",
-        description: "Description 1",
-        status: "pending",
-        userId: "user1",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: "2",
-        title: "Task 2",
-        description: "Description 2",
-        status: "completed",
-        userId: "user2",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ];
+  ): Promise<{ tasks: ITask[]; total: number }> {
+    const query: any = {};
 
-    return tasks;
+    // Adiciona filtros somente se existirem
+    if (filters?.status) query.status = filters.status;
+    if (filters?.userId) query.userId = filters.userId;
+
+    const page = pagination?.page || 1;
+    const limit = pagination?.limit || 10;
+    const skip = (page - 1) * limit;
+
+    // Busca as tarefas e o total de tarefas filtradas
+    const [tasks, total] = await Promise.all([
+      TaskModel.find(query).skip(skip).limit(limit),
+      TaskModel.countDocuments(query),
+    ]);
+
+    // Converte os _id para id
+    const formattedTasks: ITask[] = tasks.map((task) => ({
+      id: task._id.toString(),
+      title: task.title,
+      description: task.description,
+      status: task.status,
+      userId: task.userId,
+      createdAt: task.createdAt,
+      updatedAt: task.updatedAt,
+    }));
+
+    return { tasks: formattedTasks, total };
   }
 
   async findById(id: string): Promise<ITask | null> {
-    // Simulação de busca no banco de dados
-    const task: ITask = {
-      id,
-      title: "Sample Task",
-      description: "This is a sample task",
-      status: "pending",
-      userId: "user1",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    if (!Types.ObjectId.isValid(id)) return null; // Caso o ID for inválido
 
-    return task;
+    const task = await TaskModel.findById(id);
+    if (!task) return null;
+
+    return {
+      id: task._id.toString(),
+      title: task.title,
+      description: task.description,
+      status: task.status,
+      userId: task.userId,
+      createdAt: task.createdAt,
+      updatedAt: task.updatedAt,
+    };
   }
 
   async update(
@@ -77,7 +86,7 @@ export class TaskRepository implements ITaskRepository {
       status?: "pending" | "completed" | "canceled";
     }
   ): Promise<ITask | null> {
-    // Simulação de atualização no banco de dados
+    /* Simulação de atualização no banco de dados
     const updatedTask: ITask = {
       id,
       title: taskData.title || "Updated Task",
@@ -89,11 +98,17 @@ export class TaskRepository implements ITaskRepository {
     };
 
     return updatedTask;
+    */
+
+    return await TaskModel.findByIdAndUpdate(id, taskData, { new: true });
   }
 
   async delete(id: string): Promise<boolean> {
-    // Simulação de deletar
+    /* Simulação de deletar
     return true;
+    */
+    const result = await TaskModel.findByIdAndDelete(id);
+    return !!result;
   }
 
   async findByStatus(
@@ -113,5 +128,27 @@ export class TaskRepository implements ITaskRepository {
     ];
 
     return tasks;
+  }
+
+  async updateToComplete(id: string): Promise<ITask | null> {
+    if (!Types.ObjectId.isValid(id)) return null;
+
+    const updatedTask = await TaskModel.findByIdAndUpdate(
+      id,
+      { status: "completed" },
+      { new: true } // Retorna atualizado
+    );
+
+    if (!updatedTask) return null;
+
+    return {
+      id: updatedTask._id.toString(),
+      title: updatedTask.title,
+      description: updatedTask.description,
+      status: updatedTask.status,
+      userId: updatedTask.userId,
+      createdAt: updatedTask.createdAt,
+      updatedAt: updatedTask.updatedAt,
+    };
   }
 }
