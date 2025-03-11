@@ -23,7 +23,13 @@ export class TaskController implements ITaskController {
     next: NextFunction
   ): Promise<void | Response> {
     try {
-      const { title, description, status, userId } = req.body;
+      const { title, description, status } = req.body;
+
+      const userId = req.userId;
+
+      if (!userId) {
+        return res.status(401).json({ message: "Usuário não autenticado!" });
+      }
 
       const newTask = await this.taskService.create({
         title,
@@ -43,11 +49,16 @@ export class TaskController implements ITaskController {
     next: NextFunction
   ): Promise<void | Response> {
     try {
-      const { status, userId } = req.query;
+      const { status } = req.query;
       const { page = 1, limit = 10 } = req.query;
+      const userId = req.userId;
+
+      if (!userId) {
+        return res.status(401).json({ message: "Usuário não autenticado!" });
+      }
 
       const { tasks, total } = await this.taskService.findAll(
-        { status: status as string, userId: userId as string },
+        { status: status as string, userId },
         { page: Number(page), limit: Number(limit) }
       );
 

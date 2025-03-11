@@ -1,0 +1,28 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const dotenv_1 = __importDefault(require("dotenv"));
+const taskRoutes_1 = __importDefault(require("./routes/taskRoutes"));
+const taskController_1 = require("./controllers/taskController");
+const taskService_1 = require("./services/taskService");
+const mongoConnection_1 = require("./database/mongoConnection");
+const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
+const userController_1 = require("./controllers/userController");
+const userService_1 = require("./services/userService");
+dotenv_1.default.config();
+const app = (0, express_1.default)();
+const PORT = process.env.PORT || 1999;
+(0, mongoConnection_1.connectDB)();
+const userService = new userService_1.UserService();
+const userController = new userController_1.UserController(userService);
+const taskService = new taskService_1.TaskService();
+const taskController = new taskController_1.TaskController(taskService);
+const userRouter = (0, userRoutes_1.default)(userController);
+const taskRouter = (0, taskRoutes_1.default)(taskController);
+app.use(express_1.default.json());
+app.use(userRouter);
+app.use(taskRouter);
+app.listen(PORT, () => console.log(`Servidor funcionando na porta ${PORT} ...`));

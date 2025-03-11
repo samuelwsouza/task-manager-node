@@ -25,7 +25,7 @@ const taskRouter = taskRoutes(taskController);
 
 app.use(express.json());
 app.use(userRouter);
-app.use("/api", taskRouter);
+app.use(taskRouter);
 
 app.listen(PORT, () =>
   console.log(`Servidor funcionando na porta ${PORT} ...`)
