@@ -35,5 +35,11 @@ export interface ITaskRepository {
   delete(id: string): Promise<boolean>;
 
   // Busca tarefas por status
-  findByStatus(status: "pending" | "completed" | "canceled"): Promise<ITask[]>;
+  findByStatus(
+    userId: string,
+    status: "pending" | "completed" | "canceled"
+  ): Promise<ITask[]>;
+
+  // Atualiza uma tarefa para "concluída"
+  updateToComplete(id: string): Promise<any>;
 }

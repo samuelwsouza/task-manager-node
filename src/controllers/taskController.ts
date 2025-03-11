@@ -103,6 +103,14 @@ export class TaskController implements ITaskController {
     try {
       const { id } = req.params;
       const { title, description, status } = req.body;
+      const userId = req.userId;
+
+      const task = await this.taskService.findById(id);
+      if (!task || task.userId !== userId) {
+        return res.status(403).json({
+          message: "Acesso negado! Você não pode editar esta tarefa!",
+        });
+      }
 
       const updatedTask = await this.taskService.update(id, {
         title,
@@ -122,6 +130,14 @@ export class TaskController implements ITaskController {
   ): Promise<void | Response> {
     try {
       const { id } = req.params;
+      const userId = req.userId;
+
+      const task = await this.taskService.findById(id);
+      if (!task || task.userId !== userId) {
+        return res.status(403).json({
+          message: "Acesso negado! Você não pode excluir esta tarefa!",
+        });
+      }
       await this.taskService.delete(id);
       return res.status(200).json({ message: "Task deleted successfully" });
     } catch (error) {
@@ -136,7 +152,13 @@ export class TaskController implements ITaskController {
   ): Promise<void | Response> {
     try {
       const { status } = req.params;
-      const tasks = await this.taskService.findByStatus(status);
+      const userId = req.userId;
+
+      if (!userId) {
+        return res.status(401).json({ message: "Acesso negado!" });
+      }
+
+      const tasks = await this.taskService.findByStatus(status, userId);
       return res.status(200).json(tasks);
     } catch (error) {
       next(error);
@@ -150,6 +172,15 @@ export class TaskController implements ITaskController {
   ): Promise<void | Response> {
     try {
       const { id } = req.params;
+      const userId = req.userId; // Pegando do middleware
+
+      const task = await this.taskService.findById(id);
+      if (!task || task.userId !== userId) {
+        return res.status(403).json({
+          message: "Acesso negado! Você não pode concluir esta tarefa.",
+        });
+      }
+
       const updatedTask = await this.taskService.updateToComplete(id);
       return res.status(200).json(updatedTask);
     } catch (error) {

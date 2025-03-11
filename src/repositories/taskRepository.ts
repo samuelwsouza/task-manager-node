@@ -112,22 +112,22 @@ export class TaskRepository implements ITaskRepository {
   }
 
   async findByStatus(
+    userId: string,
     status: "pending" | "completed" | "canceled"
   ): Promise<ITask[]> {
-    // Simulação de busca no banco de dados
-    const tasks: ITask[] = [
-      {
-        id: "1",
-        title: "Task 1",
-        description: "Description 1",
-        status,
-        userId: "user1",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ];
+    const tasks = await TaskModel.find({ userId, status });
 
-    return tasks;
+    const formattedTasks: ITask[] = tasks.map((task) => ({
+      id: task._id.toString(),
+      title: task.title,
+      description: task.description,
+      status: task.status,
+      userId: task.userId,
+      createdAt: task.createdAt,
+      updatedAt: task.updatedAt,
+    }));
+
+    return formattedTasks;
   }
 
   async updateToComplete(id: string): Promise<ITask | null> {

@@ -88,10 +88,11 @@ export class TaskService implements ITaskService {
   }
 
   async findByStatus(
+    userId: string,
     status: "pending" | "completed" | "canceled"
   ): Promise<ITask[]> {
     try {
-      const tasks = await this.taskRepository.findByStatus(status);
+      const tasks = await this.taskRepository.findByStatus(userId, status);
       return tasks;
     } catch (error) {
       throw new Error("Falha ao encontrar suas tarefas...");

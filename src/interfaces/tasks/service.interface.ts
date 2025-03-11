@@ -26,7 +26,7 @@ export interface ITaskService {
   delete(id: string): Promise<any>;
 
   // Busca tarefas por status
-  findByStatus(status: string): Promise<any>;
+  findByStatus(userId: string, status: string): Promise<any>;
 
   // Atualiza uma tarefa para "concluída"
   updateToComplete(id: string): Promise<any>;
