@@ -1,6 +1,6 @@
 # Task Manager API
 
-## Este é um sistema de gerenciamento de tarefas (Task Manager) desenvolvido em Node.js com TypeScript. Ele permite criar, listar, atualizar e deletar tarefas, além de associá-las a usuários e definir status como "pendente", "concluída" ou "cancelada".
+- Este é um sistema de gerenciamento de tarefas (Task Manager) desenvolvido em Node.js com TypeScript. Ele permite criar, listar, atualizar e deletar tarefas, além de associá-las a usuários e definir status como "pendente", "concluída" ou "cancelada".
 
 ## 📋 Funcionalidades
 
