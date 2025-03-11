@@ -75,7 +75,20 @@ export class TaskController implements ITaskController {
   ): Promise<void | Response> {
     try {
       const { id } = req.params;
+      const userId = req.userId;
+
+      if (!userId) {
+        return res.status(401).json({ message: "Usuário não autenticado!" });
+      }
+
       const task = await this.taskService.findById(id);
+
+      if (task.userId !== userId) {
+        return res.status(403).json({
+          message: "Acesso negado! Tarefa não pertence a este usuário!",
+        });
+      }
+
       return res.status(200).json(task);
     } catch (error) {
       next(error);
